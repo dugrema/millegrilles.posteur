@@ -27,6 +27,9 @@
       "version": "Version {{version}}"
     },
     "menu": {
+      "blogs": "Blogs",
+      "annonces": "Annonces",
+      "vitrine": "Vitrine",
       "changerLangue": "English"
     }
   }

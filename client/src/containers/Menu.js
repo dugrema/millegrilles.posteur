@@ -30,19 +30,20 @@ function MenuItems(props) {
   return (
     <Nav className="mr-auto" activeKey={props.section} onSelect={props.changerPage}>
       <Nav.Item>
-        <Nav.Link eventKey='Principale'>
-          <Trans>menu.Principal</Trans>
+        <Nav.Link eventKey='Blogs'>
+          <Trans>menu.blogs</Trans>
         </Nav.Link>
       </Nav.Item>
-      <Dropdown as={NavItem}>
-        <Dropdown.Toggle as={NavLink}><Trans>menu.Parametres</Trans></Dropdown.Toggle>
-        <Dropdown.Menu>
-          <Dropdown.Item eventKey="Parametres"><Trans>menu.Parametres</Trans></Dropdown.Item>
-          <Dropdown.Item eventKey="Backup"><Trans>menu.Backup</Trans></Dropdown.Item>
-          <Dropdown.Item eventKey="Hebergement"><Trans>menu.Hebergement</Trans></Dropdown.Item>
-          <Dropdown.Item eventKey="Pki"><Trans>menu.Pki</Trans></Dropdown.Item>
-        </Dropdown.Menu>
-      </Dropdown>
+      <Nav.Item>
+        <Nav.Link eventKey='Annonces'>
+          <Trans>menu.annonces</Trans>
+        </Nav.Link>
+      </Nav.Item>
+      <Nav.Item>
+        <Nav.Link eventKey='Vitrine'>
+          <Trans>menu.vitrine</Trans>
+        </Nav.Link>
+      </Nav.Item>
     </Nav>
   )
 }
