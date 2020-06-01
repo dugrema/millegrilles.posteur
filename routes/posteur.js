@@ -74,7 +74,7 @@ function initialiser(fctRabbitMQParIdmg, opts) {
 function ajouterStaticRoute(route) {
   var folderStatic =
     process.env.MG_POSTEUR_STATIC_RES ||
-    '/usr/src/app/static/posteur'
+    'static/posteur'
 
   debug("Folder static pour posteur : %s", folderStatic)
 
