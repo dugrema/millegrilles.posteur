@@ -1,0 +1,37 @@
+#!/usr/bin/env node
+
+const debug = require('debug')('millegrilles:posteur:www')
+const express = require('express')
+
+const {initialiser: initialiserServer} = require('./server')
+const {initialiser: initialiserApp, initSocketIo} = require('./app');
+const amqpdao = require('../models/amqpdao')
+
+async function init() {
+
+  // Connexion AMQ
+  const {amqpdao: instAmqpdao} = await amqpdao.init()
+  const idmg = instAmqpdao.pki.idmg
+
+  debug("Initialisation serveur IDMG : %s", idmg)
+
+  // Creer une collection avec la connexion a MQ (format qui supporte hebergement)
+  const rabbitMQParIdmg = {
+    [idmg]: instAmqpdao
+  }
+
+  const fctRabbitMQParIdmg = (idmg) => {
+    return rabbitMQParIdmg[idmg]
+  }
+
+  const root = express()
+  const serverInstance = initialiserServer(root)
+
+  const app = await initialiserApp(fctRabbitMQParIdmg, {idmg})
+  root.use('/posteur', app)
+
+  // Initialiser Socket.IO sur /coupdoeil
+  initSocketIo(serverInstance)
+}
+
+init()

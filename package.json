@@ -1,0 +1,24 @@
+{
+  "name": "millegrilles.posteur",
+  "version": "1.27.0",
+  "description": "Application de publication de blogs, annonces, etc. Fontionne avec Vitrine.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./bin/www",
+    "client": "export WDS_SOCKET_PATH=/posteur/sockjs-node && node ./bin/start-client"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dugrema/millegrilles.posteur.git"
+  },
+  "author": "Mathieu Dugre",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dugrema/millegrilles.posteur/issues"
+  },
+  "homepage": "https://github.com/dugrema/millegrilles.posteur#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "millegrilles.common": "git+ssh://git.maceroc.com/git/millegrilles.common.nodejs#1.27"
+  }
+}
