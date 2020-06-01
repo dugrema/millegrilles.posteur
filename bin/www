@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-const debug = require('debug')('millegrilles:posteur:www')
+const debug = require('debug')('millegrilles:coupdoeil:www')
 const express = require('express')
 
-const {initialiser: initialiserServer} = require('./server')
-const {initialiser: initialiserApp, initSocketIo} = require('./app');
 const amqpdao = require('../models/amqpdao')
+const {initialiser: initialiserServer} = require('millegrilles.common/lib/server')
+const {initialiser: initialiserPosteur} = require('../routes/posteur')
 
 async function init() {
 
@@ -24,14 +24,13 @@ async function init() {
     return rabbitMQParIdmg[idmg]
   }
 
+  // Initalier les apps individuelles, mapper dans dict (cle est path relatif)
+  const posteur = await initialiserPosteur(fctRabbitMQParIdmg, {idmg})
+  const mappingApps = {posteur}
+
   const root = express()
-  const serverInstance = initialiserServer(root)
+  const serverInstance = initialiserServer(root, mappingApps)
 
-  const app = await initialiserApp(fctRabbitMQParIdmg, {idmg})
-  root.use('/posteur', app)
-
-  // Initialiser Socket.IO sur /coupdoeil
-  initSocketIo(serverInstance)
 }
 
 init()
