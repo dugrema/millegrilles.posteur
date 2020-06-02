@@ -2,7 +2,7 @@ import React from 'react'
 import { Nav, Navbar, NavDropdown, NavLink, NavItem, Dropdown, Container, Row, Col} from 'react-bootstrap';
 import { Trans, Translation, withTranslation } from 'react-i18next';
 
-export function Menu(props) {
+export default function Menu(props) {
 
   let boutonProtege
   if(props.rootProps.modeProtege) {
