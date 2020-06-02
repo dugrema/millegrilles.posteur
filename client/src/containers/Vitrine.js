@@ -28,7 +28,7 @@ function TitreVitrine(props) {
     <Container>
       <Row>
         <Col>
-          <h2 className="w3-opacity"><Trans>plume.vitrine.titre</Trans></h2>
+          <h2 className="w3-opacity"><Trans>posteur.vitrine.titre</Trans></h2>
         </Col>
       </Row>
     </Container>
@@ -40,8 +40,8 @@ class SectionAccueil extends React.Component {
   constructor(props) {
     super(props);
 
-    this.languePrincipale = this.props.documentIdMillegrille.langue
-    this.languesAdditionnelles = this.props.documentIdMillegrille.languesAdditionnelles
+    this.languePrincipale = this.props.rootProps.langue
+    this.languesAdditionnelles = this.props.rootProps.languesAdditionnelles
 
     this.languesListHelper = [
       '', ...this.languesAdditionnelles
@@ -99,17 +99,17 @@ class SectionAccueil extends React.Component {
 
     return (
       <Container>
-        <Row><Col><h3><Trans>plume.vitrine.sectionAccueil</Trans></h3></Col></Row>
+        <Row><Col><h3><Trans>posteur.vitrine.sectionAccueil</Trans></h3></Col></Row>
 
         <Form>
 
-          <p><Trans>plume.vitrine.messageBienvenue</Trans></p>
+          <p><Trans>posteur.vitrine.messageBienvenue</Trans></p>
           {messageBienvenue}
 
           <Row>
             <Col>
               <Button onClick={this.ajouterColonne}>
-                <Trans>plume.vitrine.ajouterColonne</Trans>
+                <Trans>posteur.vitrine.ajouterColonne</Trans>
               </Button>
             </Col>
           </Row>
@@ -119,10 +119,10 @@ class SectionAccueil extends React.Component {
           </Tabs>
 
           <Form.Group controlId="formMessageBienvenue">
-            <Button onClick={this.soumettre} value="sauvegarder">
+            <Button onClick={this.soumettre} value="sauvegarder" disabled={!this.props.rootProps.modeProtege}>
               <Trans>global.sauvegarder</Trans>
             </Button>
-            <Button onClick={this.soumettre} variant="danger" value="publier">
+            <Button onClick={this.soumettre} variant="danger" value="publier" disabled={!this.props.rootProps.modeProtege}>
               <Trans>global.publier</Trans>
             </Button>
           </Form.Group>
@@ -134,7 +134,7 @@ class SectionAccueil extends React.Component {
   }
 
   chargerDocumentAccueil() {
-    const domaine = 'requete.Posteur.chargerAccueil'
+    const domaine = 'Posteur.chargerAccueil'
     return this.props.rootProps.websocketApp.transmettreRequete(domaine, {})
     .then( accueilVitrine => {
       this.extraireContenuAccueilVitrine(accueilVitrine)
@@ -213,6 +213,7 @@ class SectionAccueil extends React.Component {
               languesAdditionnelles={this.languesAdditionnelles}
               changerTexteLien={this._changerTexteLien}
               supprimerLien={this._supprimerLien}
+              {...this.props}
               />
           )
         });
@@ -221,25 +222,26 @@ class SectionAccueil extends React.Component {
       const noCol = parseInt(i) + 1;
       colonnes.push(
         <Tab key={i} eventKey={"col" + i} title={"Colonne " + noCol}>
-          <p><Trans>plume.vitrine.accueilImage</Trans></p>
+          <p><Trans>posteur.vitrine.accueilImage</Trans></p>
           <ImageColonne col={i} image={colonne.image}
             changerImage={this._changerImage}
-            retirerImage={this._retirerImage} />
+            retirerImage={this._retirerImage}
+            {...this.props} />
 
-          <p><Trans>plume.vitrine.accueilTitre</Trans></p>
+          <p><Trans>posteur.vitrine.accueilTitre</Trans></p>
           {inputGroupsTitre}
 
-          <p><Trans>plume.vitrine.accueilTexte</Trans></p>
+          <p><Trans>posteur.vitrine.accueilTexte</Trans></p>
           {inputGroupsTexte}
 
-          <p><Trans>plume.vitrine.accueilLiens</Trans></p>
+          <p><Trans>posteur.vitrine.accueilLiens</Trans></p>
           <ListGroup>
             {liens}
           </ListGroup>
           <Row>
             <Col>
               <Button onClick={this.ajouterLien} value={i}>
-                <Trans>plume.vitrine.ajouterLien</Trans>
+                <Trans>posteur.vitrine.ajouterLien</Trans>
               </Button>
             </Col>
           </Row>
@@ -279,7 +281,7 @@ class SectionAccueil extends React.Component {
 
   soumettre = event => {
     let operation = event.currentTarget.value;
-    let domaine = 'millegrilles.domaines.Plume.majAccueilVitrine';
+    let domaine = 'Posteur.majAccueilVitrine';
     let transaction = {...this.state, operation}; // Cloner l'etat
     delete transaction.colonne; // Colonne est une valeur interne
 
@@ -389,7 +391,7 @@ class SectionAccueil extends React.Component {
     // console.debug("fuuid image ");
     // console.debug(fuuidImage);
 
-    const domaine = 'requete.millegrilles.domaines.GrosFichiers';
+    const domaine = 'GrosFichiers';
     const requete = {'requetes': [{
       'filtre': {
         '_mg-libelle': 'fichier',
@@ -531,18 +533,18 @@ function ImageColonne(props) {
       <Form.Row>
         <Col sm={8}>
           <Form.Group controlId={"formImage" +  props.col}>
-          <Form.Label><Trans>plume.vitrine.selectionnerImage</Trans></Form.Label>
+          <Form.Label><Trans>posteur.vitrine.selectionnerImage</Trans></Form.Label>
             <Form.Control placeholder="e.g. 90d22a60-3bea-11ea-a889-e7d8115f598f"
                         name="fuuid" value={fuuid} data-col={props.col}
                         onChange={props.changerTexteLien} />
           </Form.Group>
           <Form.Text>
-            <Button onClick={props.changerImage} data-col={props.col}>
-              <Trans>plume.vitrine.changerImage</Trans>
+            <Button onClick={props.changerImage} data-col={props.col} disabled={!props.rootProps.modeProtege}>
+              <Trans>posteur.vitrine.changerImage</Trans>
             </Button>
             <Button onClick={props.retirerImage} variant="secondary"
-                data-col={props.col}>
-              <Trans>plume.vitrine.retirerImage</Trans>
+                data-col={props.col} disabled={!props.rootProps.modeProtege}>
+              <Trans>posteur.vitrine.retirerImage</Trans>
             </Button>
           </Form.Text>
         </Col>
