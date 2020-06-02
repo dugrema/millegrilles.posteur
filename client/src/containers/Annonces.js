@@ -30,27 +30,20 @@ export default class Annonces extends React.Component {
 
   render() {
     return(
-      <Row className="w3-row-padding">
-
-        <Container className="w3-card w3-round w3-white w3-card_BR">
-          <Row>
-            <Col>
-              <h2 className="w3-opacity"><Trans>posteur.annonces.titre</Trans></h2>
-              <p><Trans>posteur.annonces.description</Trans></p>
-            </Col>
-          </Row>
-        </Container>
+      <Container>
 
         <RenderNouvelleAnnonce
           actions={this.actions}
           update={this.update}
+          {...this.props}
           {...this.state} />
 
         <RenderAnnoncesRecentes
           annoncesRecentes={this.state.annoncesRecentes}
-          supprimerAnnonce={this.actions.supprimerAnnonce} />
+          supprimerAnnonce={this.actions.supprimerAnnonce}
+          {...this.props} />
 
-      </Row>
+      </Container>
     );
   }
 
@@ -64,7 +57,7 @@ export default class Annonces extends React.Component {
           transaction.sujet = this.state.sujetNouvelleAnnonce;
         }
 
-        let domaine = 'Plume.creerAnnonce';
+        let domaine = 'Posteur.creerAnnonce';
         this.props.rootProps.websocketApp.transmettreTransaction(domaine, transaction)
         .then(reponse=>{
           if(reponse.err) {
@@ -89,7 +82,7 @@ export default class Annonces extends React.Component {
     },
     supprimerAnnonce: event => {
       const uuid = event.currentTarget.value;
-      let domaine = 'Plume.supprimerAnnonce';
+      let domaine = 'Posteur.supprimerAnnonce';
 
       let transaction = {uuid};
       this.props.rootProps.websocketApp.transmettreTransaction(domaine, transaction)
@@ -123,7 +116,8 @@ export default class Annonces extends React.Component {
   }
 
   chargerAnnoncesRecentes() {
-    let routingKey = 'requete.Plume.chargerAnnoncesRecentes';
+    console.debug("Charger annonces existantes")
+    let routingKey = 'Posteur.chargerAnnoncesRecentes';
     this.props.rootProps.websocketApp.transmettreRequete(routingKey, {})
     .then(annoncesRecentes => {
       this.setState({annoncesRecentes});
@@ -140,58 +134,63 @@ export default class Annonces extends React.Component {
 
 }
 
-function RenderNouvelleAnnonce(props) {
+class RenderNouvelleAnnonce extends React.Component {
 
-  return (
-    <Container className="w3-card w3-round w3-white w3-card_BR">
-      <Row>
-        <Col>
-          <h2 className="w3-opacity"><Trans>posteur.annonces.nouvelleAnnonce</Trans></h2>
-          <p><Trans>posteur.annonces.descriptionNouvelleAnnonce</Trans></p>
-        </Col>
-      </Row>
+  state = {
+    ouvrir: false,
+  }
 
-      <Row>
-        <Col>
-          <Form className="formNouvelleAnnonce">
-            <Form.Group controlId="formSujetAnnonce">
-              <Form.Label><Trans>posteur.annonces.sujetNouvelleAnnonce</Trans></Form.Label>
-              <Form.Control type="plaintext" placeholder="Un sujet (optionnel)"
-                            value={props.sujetNouvelleAnnonce}
-                            onChange={props.update.changerSujetNouvelleAnnonce} />
-              <Form.Text className="text-muted">
-                <Trans values={{
-                  restants: props.compteCharsRestantsSujet,
-                  max: SUJET_CHARS_MAX
-                }}>
-                  posteur.annonces.sujetNouvelleAnnonceInfo
-                </Trans>
-              </Form.Text>
-            </Form.Group>
-            <Form.Group controlId="formTexteAnnonce">
-              <Form.Label><Trans>posteur.annonces.texteNouvelleAnnonce</Trans></Form.Label>
-              <Form.Control type="plaintext" placeholder="Texte de l'annonce"
-                            as="textarea" rows="4"
-                            value={props.texteNouvelleAnnonce}
-                            onChange={props.update.changerTexteNouvelleAnnonce} />
-              <Form.Text className="text-muted">
-                <Trans values={{
-                  restants: props.compteCharsRestantsTexte,
-                  max: TEXTE_CHARS_MAX
-                }}>
-                  posteur.annonces.texteNouvelleAnnonceInfo
-                </Trans>
-              </Form.Text>
-            </Form.Group>
-            <Button onClick={props.actions.publierAnnonce}>
-              <Trans>posteur.annonces.nouvelleAnnonceBoutonPublier</Trans>
-            </Button>
-          </Form>
-        </Col>
-      </Row>
+  render() {
+    return (
+      <Container className="w3-card w3-round w3-white w3-card_BR">
+        <Row>
+          <Col>
+            <p><Trans>posteur.annonces.descriptionNouvelleAnnonce</Trans></p>
+          </Col>
+        </Row>
 
-    </Container>
-  );
+        <Row>
+          <Col>
+            <Form className="formNouvelleAnnonce">
+              <Form.Group controlId="formSujetAnnonce">
+                <Form.Label><Trans>posteur.annonces.sujetNouvelleAnnonce</Trans></Form.Label>
+                <Form.Control type="plaintext" placeholder="Un sujet (optionnel)"
+                              value={this.props.sujetNouvelleAnnonce}
+                              onChange={this.props.update.changerSujetNouvelleAnnonce} />
+                <Form.Text className="text-muted">
+                  <Trans values={{
+                    restants: this.props.compteCharsRestantsSujet,
+                    max: SUJET_CHARS_MAX
+                  }}>
+                    posteur.annonces.sujetNouvelleAnnonceInfo
+                  </Trans>
+                </Form.Text>
+              </Form.Group>
+              <Form.Group controlId="formTexteAnnonce">
+                <Form.Label><Trans>posteur.annonces.texteNouvelleAnnonce</Trans></Form.Label>
+                <Form.Control type="plaintext" placeholder="Texte de l'annonce"
+                              as="textarea" rows="4"
+                              value={this.props.texteNouvelleAnnonce}
+                              onChange={this.props.update.changerTexteNouvelleAnnonce} />
+                <Form.Text className="text-muted">
+                  <Trans values={{
+                    restants: this.props.compteCharsRestantsTexte,
+                    max: TEXTE_CHARS_MAX
+                  }}>
+                    posteur.annonces.texteNouvelleAnnonceInfo
+                  </Trans>
+                </Form.Text>
+              </Form.Group>
+              <Button onClick={this.props.actions.publierAnnonce} disabled={!this.props.rootProps.modeProtege}>
+                <Trans>posteur.annonces.nouvelleAnnonceBoutonPublier</Trans>
+              </Button>
+            </Form>
+          </Col>
+        </Row>
+
+      </Container>
+    )
+  }
 }
 
 function RenderAnnoncesRecentes(props) {
@@ -230,7 +229,7 @@ function RenderAnnoncesRecentes(props) {
             {texte}
           </Col>
           <Col sm={1}>
-            <Button onClick={props.supprimerAnnonce} value={annonce.uuid} variant="danger">
+            <Button onClick={props.supprimerAnnonce} value={annonce.uuid} disabled={!props.rootProps.modeProtege} variant="danger">
               <i className="fa fa-remove" />
             </Button>
           </Col>
