@@ -105,10 +105,6 @@ async function _demanderInfo(rabbitMQ) {
 }
 
 function _majInfo(routingKey, message, opts) {
-  debug("MAJ Info millegrille, routing %s", routingKey)
-  debug(message)
-  debug(opts)
-
   const keys = ['idmg', 'langue', 'languesAdditionnelles', 'nomMilleGrille']
   const infoUpdate = keys.reduce((infoDict, key) => {
     if(message[key]) {
