@@ -2,9 +2,10 @@ import React from 'react'
 
 import Accueil from './Accueil'
 import Annonces from './Annonces'
+import Blogs from './Blogs'
 import Vitrine from './Vitrine'
 
-const domainesConnus = {Annonces, Vitrine}
+const domainesConnus = {Annonces, Vitrine, Blogs}
 
 export function SectionContenu(props) {
 

@@ -1,22 +1,21 @@
 import React from 'react';
-import { Feuille } from '../mgcomponents/Feuilles'
-import { Form, Button, ListGroup, Row, Col } from 'react-bootstrap';
+import { Container, Form, Button, ListGroup, Row, Col } from 'react-bootstrap';
 import { Trans } from 'react-i18next';
-import webSocketManager from '../WebSocketManager';
-import { DateTimeFormatter } from '../mgcomponents/ReactFormatters';
-import { InputTextMultilingue } from '../mgcomponents/InputMultilingue';
+
+import { DateTimeFormatter } from '../components/reactFormatters';
+import { InputTextMultilingue } from '../components/inputMultilingue';
 
 const PREFIX_DATA_URL = 'data:image/jpeg;base64,';
-const UUID_PLACEHOLDER = 'PLACEHOLDER';
 
-export class PlumeBlogs extends React.Component {
+export default class PlumeBlogs extends React.Component {
 
   state = {
-    uuidBlogpost: null,
+    uuidBlogpost: '',
+    nouveauBlogpost: false,
   }
 
   render() {
-    if(this.state.uuidBlogpost) {
+    if(this.state.uuidBlogpost || this.state.nouveauBlogpost) {
       return (
         <BlogPost
           uuidBlogpost={this.state.uuidBlogpost}
@@ -35,7 +34,7 @@ export class PlumeBlogs extends React.Component {
   }
 
   _nouveauBlogpost = event => {
-    this.setState({uuidBlogpost: UUID_PLACEHOLDER});
+    this.setState({uuidBlogpost: '', nouveauBlogpost: true});
   }
 
   _chargerBlogpost = event => {
@@ -48,7 +47,7 @@ export class PlumeBlogs extends React.Component {
   }
 
   _retour = event => {
-    this.setState({uuidBlogpost: null});
+    this.setState({uuidBlogpost: null, nouveauBlogpost: false})
   }
 
 }
@@ -61,26 +60,26 @@ class ListeBlogposts extends React.Component {
   }
 
   componentDidMount() {
-    this.chargerListeBlogposts();
+    this.chargerListeBlogposts()
   }
 
   render() {
     return (
       <div>
-        <Feuille>
+        <Container>
           <Row>
             <Col>
-              <h2 className="w3-opacity"><Trans>plume.blogs.titre</Trans></h2>
+              <h2 className="w3-opacity"><Trans>posteur.blogs.titre</Trans></h2>
             </Col>
           </Row>
           <Row>
             <Col>
               <Button onClick={this.props.nouveau}>
-                <Trans>plume.blogs.nouveauBlogpost</Trans>
+                <Trans>posteur.blogs.nouveauBlogpost</Trans>
               </Button>
             </Col>
           </Row>
-        </Feuille>
+        </Container>
 
         <ListeBlogpostsDetail
           chargerListeBlogposts={this.chargerListeBlogposts}
@@ -88,46 +87,28 @@ class ListeBlogposts extends React.Component {
           chargerBlogpost={this.props.chargerBlogpost}
           retirerBlogpost={this.retirerBlogpost}
           supprimerBlogpost={this.supprimerBlogpost}
-          publierBlogpost={this.publierBlogpost} />
+          publierBlogpost={this.publierBlogpost}
+          rootProps={this.props.rootProps} />
 
       </div>
     )
   }
 
-  chargerListeBlogposts = event => {
+  chargerListeBlogposts = async (event) => {
 
     let limit = 5;
 
     const currentIndex = this.state.startingIndex;
-    const domaine = 'requete.millegrilles.domaines.Plume';
-    const requete = {'requetes': [
-      {
-        'filtre': {
-          '_mg-libelle': 'blogpost',
-        },
-        'projection': {
-          "uuid": 1, "_mg-derniere-modification": 1, "datePublication": 1,
-          "titre": 1, "titre_fr": 1, "titre_en": 1
-        },
-        'hint': [
-          {'_mg-libelle': 1},
-          {'_mg-derniere-modification': -1}
-        ],
-        'limit': limit,
-        'skip': currentIndex,
-      }
-    ]};
+    const domaine = 'Posteur.chargerBlogposts';
+    const requete = {currentIndex, limit};
+    const resultBlogposts = await this.props.rootProps.websocketApp.transmettreRequete(domaine, requete)
+    console.debug("Resultats requete");
+    console.debug(resultBlogposts);
 
-    return webSocketManager.transmettreRequete(domaine, requete)
-    .then( docsRecu => {
-      // console.debug("Resultats requete");
-      // console.debug(docsRecu);
-      let resultBlogposts = docsRecu[0];
-      let startingIndex = resultBlogposts.length + currentIndex;
+    let startingIndex = resultBlogposts.length + currentIndex;
 
-      const blogposts = [...this.state.blogposts, ...resultBlogposts];
-      this.setState({startingIndex, blogposts});
-    });
+    const blogposts = [...this.state.blogposts, ...resultBlogposts];
+    this.setState({startingIndex, blogposts});
   }
 
   publierBlogpost = event => {
@@ -136,8 +117,8 @@ class ListeBlogposts extends React.Component {
     const transaction = {
       uuid: uuidBlogpost
     }
-    const domaine = 'millegrilles.domaines.Plume.publierBlogpostVitrine';
-    webSocketManager.transmettreTransaction(domaine, transaction)
+    const domaine = 'Posteur.publierBlogpostVitrine';
+    this.props.rootProps.websocketApp.transmettreTransaction(domaine, transaction)
     .then(reponse=>{
       if(reponse.err) {
         console.error("Erreur transaction");
@@ -168,8 +149,8 @@ class ListeBlogposts extends React.Component {
     const transaction = {
       uuid: uuidBlogpost
     }
-    const domaine = 'millegrilles.domaines.Plume.retirerBlogpostVitrine';
-    webSocketManager.transmettreTransaction(domaine, transaction)
+    const domaine = 'Posteur.retirerBlogpostVitrine';
+    this.props.rootProps.websocketApp.transmettreTransaction(domaine, transaction)
     .then(reponse=>{
       if(reponse.err) {
         console.error("Erreur transaction");
@@ -201,8 +182,8 @@ class ListeBlogposts extends React.Component {
     const transaction = {
       uuid: uuidBlogpost
     }
-    const domaine = 'millegrilles.domaines.Plume.supprimerBlogpostVitrine';
-    webSocketManager.transmettreTransaction(domaine, transaction)
+    const domaine = 'Posteur.supprimerBlogpostVitrine';
+    this.props.rootProps.websocketApp.transmettreTransaction(domaine, transaction)
     .then(reponse=>{
       if(reponse.err) {
         console.error("Erreur transaction");
@@ -234,14 +215,14 @@ function ListeBlogpostsDetail(props) {
       if(bp.datePublication) {
         // Deja publie, on affiche le bouton retirer
         boutonPublierRetirer = (
-          <Button onClick={props.retirerBlogpost} value={bp.uuid}>
+          <Button onClick={props.retirerBlogpost} value={bp.uuid} disabled={!props.rootProps.modeProtege}>
             <i className="fa fa-remove"/>
           </Button>
         );
       } else {
         // Pas publie, on affiche le bouton publier
         boutonPublierRetirer = (
-          <Button onClick={props.publierBlogpost} value={bp.uuid}>
+          <Button onClick={props.publierBlogpost} value={bp.uuid} disabled={!props.rootProps.modeProtege}>
             <i className="fa fa-cloud-upload"/>
           </Button>
         );
@@ -260,7 +241,7 @@ function ListeBlogpostsDetail(props) {
             </Col>
             <Col sm={2} md={1}>
               {boutonPublierRetirer}
-              <Button variant="danger" onClick={props.supprimerBlogpost} value={bp.uuid}>
+              <Button variant="danger" onClick={props.supprimerBlogpost} value={bp.uuid} disabled={!props.rootProps.modeProtege}>
                 <i className="fa fa-trash"/>
               </Button>
             </Col>
@@ -274,7 +255,7 @@ function ListeBlogpostsDetail(props) {
   // console.debug(liste);
 
   return (
-    <Feuille>
+    <Container>
       <Row>
         <Col><h3>Liste blogposts</h3></Col>
       </Row>
@@ -284,10 +265,10 @@ function ListeBlogpostsDetail(props) {
       </ListGroup>
 
       <Button onClick={props.chargerListeBlogposts}>
-        <Trans>plume.blogs.chargerBlogposts</Trans>
+        <Trans>posteur.blogs.chargerBlogposts</Trans>
       </Button>
 
-    </Feuille>
+    </Container>
   );
 }
 
@@ -297,44 +278,36 @@ class BlogPost extends React.Component {
   }
 
   componentDidMount() {
-    this.chargerBlogpost();
+    this.chargerBlogpost()
   }
 
-  chargerBlogpost() {
-    if(this.props.uuidBlogpost !== UUID_PLACEHOLDER) {
-      const domaine = 'requete.millegrilles.domaines.Plume';
-      const requete = {'requetes': [{
-        'filtre': {
-          '_mg-libelle': 'blogpost',
-          'uuid': this.props.uuidBlogpost,
-        },
-        'hint': [{'uuid': 1}]
-      }]};
+  async chargerBlogpost() {
+    if(this.props.uuidBlogpost) {
+      console.debug("Chargement blogpost %s", this.props.uuidBlogpost)
+      const domaine = 'Posteur.chargerBlogpost'
+      const requete = {'uuidBlogpost': this.props.uuidBlogpost}
 
-      return webSocketManager.transmettreRequete(domaine, requete)
-      .then( docsRecu => {
-        // console.debug("Resultats requete");
-        // console.debug(docsRecu);
-        var blogpostIn = docsRecu[0][0];
-        const blogpost = {};
+      const blogpost = await this.props.rootProps.websocketApp.transmettreRequete(domaine, requete)
 
-        // console.debug("Blogpost filtrer")
-        if(blogpostIn) {
-          var champs = [
-            'uuid', 'texte', 'titre', 'image', 'datePublication'
-          ];
-          for(let champ in blogpostIn) {
-            var champsInclus = champs.filter(c=>{
-              return champ.startsWith(c);
-            })
-            if(champsInclus.length > 0) {
-              blogpost[champ] = blogpostIn[champ];
-            }
-          }
-        }
+      console.debug("Resultats requete chargement blogpost %s", this.props.uuidBlogpost);
+      console.debug(blogpost);
 
-        this.setState({...blogpost});
-      });
+      var champs = [
+        'uuid', 'texte', 'titre', 'image', 'datePublication'
+      ]
+
+      const blogpostFiltre = {}
+      for(let champ in blogpost) {
+        var champsInclus = champs
+          .filter(c=>{
+            return champ.startsWith(c)
+          })
+          .forEach(champ=>{
+            blogpost[champ] = blogpost[champ]
+          })
+      }
+
+      this.setState({...blogpost})
     }
   }
 
@@ -342,7 +315,7 @@ class BlogPost extends React.Component {
 
     return (
       <div>
-        <Feuille>
+        <Container>
 
           <Row>
             <Col><h2>Blogpost</h2></Col>
@@ -359,19 +332,20 @@ class BlogPost extends React.Component {
           <Row>
             Publication:
             <DateTimeFormatter date={this.state.datePublication}/>
-            <Button onClick={this.sauvegarder} variant='danger' value='publier'>
+            <Button onClick={this.sauvegarder} variant='danger' value='publier' disabled={!this.props.rootProps.modeProtege}>
               <Trans>global.publier</Trans>
             </Button>
           </Row>
 
-        </Feuille>
+        </Container>
 
         <EntreeBlog blogpost={this.state}
           documentIdMillegrille={this.props.documentIdMillegrille}
           image={this.state.image}
           onTextChange={this._changerTexte}
           sauvegarder={this.sauvegarder}
-          changerImage={this._changerImage} retirerImage={this._retirerImage}/>
+          changerImage={this._changerImage} retirerImage={this._retirerImage}
+          rootProps={this.props.rootProps} />
 
       </div>
     )
@@ -389,16 +363,20 @@ class BlogPost extends React.Component {
   }
 
   sauvegarder = event => {
-    // console.debug("Sauvegarder")
+    console.debug("Sauvegarder")
     // console.debug(this.state);
 
     let operation = event.currentTarget.value;
-    let domaine = 'millegrilles.domaines.Plume.majBlogpostVitrine';
-    let transaction = {...this.state, operation}; // Cloner l'etat
+    let domaine = 'Posteur.majBlogpostVitrine'
 
-    // console.debug(transaction);
+    let transaction = {operation} // Cloner l'etat
+    for(let key in this.state) {
+      if( ! key.startsWith('_') ) transaction[key] = this.state[key]
+    }
 
-    webSocketManager.transmettreTransaction(domaine, transaction)
+    console.debug(transaction)
+
+    this.props.rootProps.websocketApp.transmettreTransaction(domaine, transaction)
     .then(reponse=>{
       if(reponse.err) {
         console.error("Erreur transaction majBlogpostVitrine");
@@ -436,7 +414,7 @@ class BlogPost extends React.Component {
     // console.debug("fuuid image ");
     // console.debug(fuuidImage);
 
-    const domaine = 'requete.millegrilles.domaines.GrosFichiers';
+    const domaine = 'GrosFichiers';
     const requete = {'requetes': [{
       'filtre': {
         '_mg-libelle': 'fichier',
@@ -448,7 +426,7 @@ class BlogPost extends React.Component {
     // console.debug("Requete");
     // console.debug(requete);
 
-    return webSocketManager.transmettreRequete(domaine, requete)
+    return this.props.rootProps.websocketApp.transmettreRequete(domaine, requete)
     .then( docsRecu => {
       // console.debug("Resultats requete");
       let documentImage = docsRecu[0][0];
@@ -469,11 +447,11 @@ class EntreeBlog extends React.Component {
 
   render() {
     const blogpost = this.props.blogpost;
-    const languePrincipale = this.props.documentIdMillegrille.langue;
-    const languesAdditionnelles = this.props.documentIdMillegrille.languesAdditionnelles;
+    const languePrincipale = this.props.rootProps.langue;
+    const languesAdditionnelles = this.props.rootProps.languesAdditionnelles;
 
     return (
-      <Feuille>
+      <Container>
         <Row>
           <Col>
             <Form>
@@ -500,11 +478,12 @@ class EntreeBlog extends React.Component {
               <AfficherImage controlId="image"
                 image={this.props.image}
                 changerImage={this.props.changerImage}
-                retirerImage={this.props.retirerImage} />
+                retirerImage={this.props.retirerImage}
+                rootProps={this.props.rootProps} />
 
               <Form.Row>
                 <Col>
-                  <Button onClick={this.props.sauvegarder}>
+                  <Button onClick={this.props.sauvegarder} disabled={!this.props.rootProps.modeProtege}>
                     <Trans>global.sauvegarder</Trans>
                   </Button>
                 </Col>
@@ -513,7 +492,7 @@ class EntreeBlog extends React.Component {
             </Form>
           </Col>
         </Row>
-      </Feuille>
+      </Container>
     )
   }
 
@@ -536,16 +515,16 @@ function AfficherImage(props) {
       <Form.Row>
         <Col sm={8}>
           <Form.Group controlId={props.controlId}>
-          <Form.Label><Trans>plume.vitrine.selectionnerImage</Trans></Form.Label>
+          <Form.Label><Trans>posteur.vitrine.selectionnerImage</Trans></Form.Label>
             <Form.Control name="fuuid_image"
               placeholder="e.g. 90d22a60-3bea-11ea-a889-e7d8115f598f" />
           </Form.Group>
           <Form.Text>
-            <Button onClick={props.changerImage}>
-              <Trans>plume.vitrine.changerImage</Trans>
+            <Button onClick={props.changerImage} disabled={!props.rootProps.modeProtege}>
+              <Trans>posteur.vitrine.changerImage</Trans>
             </Button>
-            <Button onClick={props.retirerImage} variant="secondary">
-              <Trans>plume.vitrine.retirerImage</Trans>
+            <Button onClick={props.retirerImage} variant="secondary" disabled={!props.rootProps.modeProtege}>
+              <Trans>posteur.vitrine.retirerImage</Trans>
             </Button>
           </Form.Text>
         </Col>
