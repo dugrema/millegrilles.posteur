@@ -23,8 +23,10 @@ function initialiser(fctRabbitMQParIdmg, opts) {
 
   if(opts.idmg) {
     // Pour mode sans hebergement, on conserve le IDMG de reference local
+    const rabbitMQ = fctRabbitMQParIdmg(opts.idmg)
     _info.idmg = opts.idmg
-    _demanderInfo(fctRabbitMQParIdmg(opts.idmg))
+    _demanderInfo(rabbitMQ)
+
   } else {
     // Pas d'IDMG de reference, on est en mode hebergement
     _info.modeHebergement = true
@@ -98,13 +100,24 @@ function routeInfo(req, res, next) {
 async function _demanderInfo(rabbitMQ) {
   const domaineAction = 'Principale.getProfilMillegrille'
   const reponse = await rabbitMQ.transmettreRequete(domaineAction, {}, {decoder: true})
-  _majInfo(reponse['profil.millegrille'])
+  _majInfo('', reponse['profil.millegrille'])
+  rabbitMQ.routingKeyManager.addRoutingKeyCallback(_majInfo, ['evenement.Principale.document.profil_millegrille'])
 }
 
-function _majInfo(reponse) {
-  debug("MAJ Info millegrille")
-  debug(reponse)
-  _info = {..._info, ...reponse}
+function _majInfo(routingKey, message, opts) {
+  debug("MAJ Info millegrille, routing %s", routingKey)
+  debug(message)
+  debug(opts)
+
+  const keys = ['idmg', 'langue', 'languesAdditionnelles', 'nomMilleGrille']
+  const infoUpdate = keys.reduce((infoDict, key) => {
+    if(message[key]) {
+      infoDict[key] = message[key]
+    }
+    return infoDict
+  }, {})
+
+  _info = {..._info, ...infoUpdate}
 }
 
 module.exports = {initialiser};
