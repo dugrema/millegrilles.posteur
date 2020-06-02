@@ -11,18 +11,21 @@ export function Menu(props) {
     boutonProtege = <i className="fa fa-lg fa-unlock"/>
   }
 
-  const iconeHome = props.rootProps.nomMilleGrille || <i className="fa fa-home"/>
+  const iconeHome = <span><i className="fa fa-home"/> {props.rootProps.nomMilleGrille}</span>
 
   return (
     <Navbar collapseOnSelect expand="md" bg="info" variant="dark" fixed="top">
-      <Navbar.Brand href='/'>{iconeHome}</Navbar.Brand>
+      <Nav.Link className="navbar-brand" onClick={props.changerPage} eventKey='A'>
+        <Trans>application.nom</Trans>
+      </Nav.Link>
       <Navbar.Toggle aria-controls="responsive-navbar-menu" />
       <Navbar.Collapse id="responsive-navbar-menu">
         <Nav>
           <Nav.Link href='/'></Nav.Link>
         </Nav>
-        <MenuItems changerPage={props.changerPage} />
+        <MenuItems changerPage={props.changerPage} rootProps={props.rootProps}/>
         <Nav className="justify-content-end">
+          <Nav.Link href='/'>{iconeHome}</Nav.Link>
           <Nav.Link onClick={props.rootProps.toggleProtege}>{boutonProtege}</Nav.Link>
           <Nav.Link onClick={props.rootProps.changerLanguage}><Trans>menu.changerLangue</Trans></Nav.Link>
         </Nav>
@@ -33,7 +36,7 @@ export function Menu(props) {
 
 function MenuItems(props) {
   return (
-    <Nav className="mr-auto" activeKey={props.section} onSelect={props.changerPage}>
+    <Nav className="mr-auto" activeKey={props.rootProps.page} onSelect={props.changerPage}>
       <Nav.Item>
         <Nav.Link eventKey='Blogs'>
           <Trans>menu.blogs</Trans>

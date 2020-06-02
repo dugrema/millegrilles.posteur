@@ -23,6 +23,7 @@
       "desactiver": "Desactiver"
     },
     "application": {
+      "nom": "Posteur",
       "advert": "Posteur sur MilleGrilles",
       "version": "v.{{version}}"
     },
