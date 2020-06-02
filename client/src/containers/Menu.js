@@ -11,11 +11,16 @@ export function Menu(props) {
     boutonProtege = <i className="fa fa-lg fa-unlock"/>
   }
 
+  const iconeHome = props.rootProps.nomMilleGrille || <i className="fa fa-home"/>
+
   return (
     <Navbar collapseOnSelect expand="md" bg="info" variant="dark" fixed="top">
-      <Navbar.Brand href='/'><i className="fa fa-home"/></Navbar.Brand>
+      <Navbar.Brand href='/'>{iconeHome}</Navbar.Brand>
       <Navbar.Toggle aria-controls="responsive-navbar-menu" />
       <Navbar.Collapse id="responsive-navbar-menu">
+        <Nav>
+          <Nav.Link href='/'></Nav.Link>
+        </Nav>
         <MenuItems changerPage={props.changerPage} />
         <Nav className="justify-content-end">
           <Nav.Link onClick={props.rootProps.toggleProtege}>{boutonProtege}</Nav.Link>

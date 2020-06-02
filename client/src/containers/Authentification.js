@@ -48,6 +48,13 @@ export class VerificationInfoServeur extends React.Component {
       erreurAccesServeur: false,
     }
 
+    const keys = ['langue', 'languesAdditionnelles', 'nomMilleGrille']
+    keys.forEach(key => {
+      if(serveurInfo[key]) {
+        stateUpdate[key] = serveurInfo[key]
+      }
+    })
+
     const idmgSauvegarde = localStorage.getItem('idmg')
     if(!idmgSauvegarde || !hebergement) {
 

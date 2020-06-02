@@ -13,6 +13,11 @@ const manifest = {
   version: "DUMMY",
 }
 
+const subscriptionsGlobales = [
+  'evenement.Principale.document.profil_millegrille'
+]
+
+
 export class ApplicationPosteur extends React.Component {
 
   state = {
@@ -24,15 +29,21 @@ export class ApplicationPosteur extends React.Component {
     modeProtege: false,         // Mode par defaut est lecture seule (prive)
 
     page: '',
+
+    langue: '',
+    languesAdditionnelles: '',
+    nomMilleGrille: '',
   }
 
   setInfoServeur = (info) => {
     this.setState(info)
   }
 
-  setWebsocketApp = websocketApp => {
+  setWebsocketApp = async (websocketApp) => {
     // Set la connexion Socket.IO. Par defaut, le mode est prive (lecture seule)
     this.setState({websocketApp, modeProtege: false})
+
+    websocketApp.subscribe(subscriptionsGlobales, this.recevoirMessage)
   }
 
   changerPage = page => {
@@ -75,6 +86,16 @@ export class ApplicationPosteur extends React.Component {
     this.setState({modeProtege: false})
   }
 
+  recevoirMessage = (routing, message, opts) => {
+    console.debug("Message recu, routing : %s", routing)
+    console.debug(message)
+
+    if(routing === 'evenement.Principale.document.profil_millegrille') {
+      const info = _majInfoMillegrille(message)
+      this.setState(info)
+    }
+  }
+
   render() {
 
     const rootProps = {...this.state, manifest, toggleProtege: this.toggleProtege}
@@ -107,4 +128,16 @@ class ApplicationConnectee extends React.Component {
     )
   }
 
+}
+
+function _majInfoMillegrille(message, infoActuelle) {
+  const keys = ['langue', 'languesAdditionnelles', 'nomMilleGrille']
+  const infoUpdate = keys.reduce((infoDict, key) => {
+    if(message[key]) {
+      infoDict[key] = message[key]
+    }
+    return infoDict
+  }, {})
+
+  return infoUpdate
 }
