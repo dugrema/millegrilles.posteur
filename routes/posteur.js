@@ -14,7 +14,7 @@ var _sessionManagement = null
 // Application de gestion des evenements de Socket.IO
 var _webSocketApp = null
 
-const _info = {
+var _info = {
   modeHebergement: false,
 };
 
@@ -24,6 +24,7 @@ function initialiser(fctRabbitMQParIdmg, opts) {
   if(opts.idmg) {
     // Pour mode sans hebergement, on conserve le IDMG de reference local
     _info.idmg = opts.idmg
+    _demanderInfo(fctRabbitMQParIdmg(opts.idmg))
   } else {
     // Pas d'IDMG de reference, on est en mode hebergement
     _info.modeHebergement = true
@@ -93,5 +94,17 @@ function routeInfo(req, res, next) {
   res.end(reponse);
 
 };
+
+async function _demanderInfo(rabbitMQ) {
+  const domaineAction = 'Principale.getProfilMillegrille'
+  const reponse = await rabbitMQ.transmettreRequete(domaineAction, {}, {decoder: true})
+  _majInfo(reponse['profil.millegrille'])
+}
+
+function _majInfo(reponse) {
+  debug("MAJ Info millegrille")
+  debug(reponse)
+  _info = {..._info, ...reponse}
+}
 
 module.exports = {initialiser};
