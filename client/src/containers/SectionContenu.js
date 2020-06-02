@@ -1,6 +1,10 @@
 import React from 'react'
 
+import Accueil from './Accueil'
+import Annonces from './Annonces'
+
 const domainesConnus = {
+  Annonces,
 };
 
 export function SectionContenu(props) {
@@ -11,7 +15,7 @@ export function SectionContenu(props) {
   if(Page) {
     contenu = <Page rootProps={props.rootProps} />
   } else {
-    contenu = <p>Section non definie : "{contenu}"</p>
+    contenu = <Accueil {...props.rootProps} />
   }
 
   return contenu

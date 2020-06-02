@@ -24,13 +24,27 @@
     },
     "application": {
       "advert": "Posteur sur MilleGrilles",
-      "version": "Version {{version}}"
+      "version": "v.{{version}}"
     },
     "menu": {
       "blogs": "Blogs",
       "annonces": "Annonces",
       "vitrine": "Vitrine",
       "changerLangue": "English"
+    },
+    "posteur": {
+      "annonces": {
+        "titre": "Annonces",
+        "description": "Les annonces sont de courts messages publics affichés dans Vitrine.",
+        "nouvelleAnnonce": "Nouvelle annonce",
+        "descriptionNouvelleAnnonce": "Publier une annonce",
+        "recentes": "Annonces récentes",
+        "sujetNouvelleAnnonce": "Sujet (optionnel)",
+        "sujetNouvelleAnnonceInfo": "Disponible : {{restants}} sur {{max}}",
+        "texteNouvelleAnnonce": "Texte",
+        "texteNouvelleAnnonceInfo": "Disponible : {{restants}} sur {{max}}",
+        "nouvelleAnnonceBoutonPublier": "Publier"
+      }
     }
   }
 }

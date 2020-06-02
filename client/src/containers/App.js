@@ -23,7 +23,7 @@ export class ApplicationPosteur extends React.Component {
     hebergement: false,
     modeProtege: false,         // Mode par defaut est lecture seule (prive)
 
-    page: 'Principale',
+    page: '',
   }
 
   setInfoServeur = (info) => {

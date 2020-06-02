@@ -10,9 +10,11 @@ import './Layout.css'
 export function LayoutCoudpoeil(props) {
 
   return (
-    <div>
-      <Entete changerPage={props.changerPage} rootProps={props.rootProps}/>
-      <Contenu page={props.page}/>
+    <div className="flex-wrapper">
+      <div>
+        <Entete changerPage={props.changerPage} rootProps={props.rootProps}/>
+        <Contenu page={props.page}/>
+      </div>
       <Footer rootProps={props.rootProps}/>
     </div>
   )
@@ -53,9 +55,9 @@ function Footer(props) {
           <div className="millegrille-footer">
             <div>IDMG : {idmg}</div>
             <div>
-              <Trans>application.coupdoeilAdvert</Trans>{' '}
+              <Trans>application.advert</Trans>{' '}
               <span title={props.rootProps.manifest.date}>
-                <Trans values={{version: props.rootProps.manifest.version}}>application.coupdoeilVersion</Trans>
+                <Trans values={{version: props.rootProps.manifest.version}}>application.version</Trans>
               </span>
             </div>
           </div>
