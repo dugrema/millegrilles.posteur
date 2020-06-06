@@ -1,6 +1,6 @@
 {
   "name": "millegrilles.posteur",
-  "version": "1.27.1",
+  "version": "1.28.0",
   "description": "Application de publication de blogs, annonces, etc. Fontionne avec Vitrine.",
   "main": "index.js",
   "scripts": {
@@ -25,7 +25,7 @@
     "font-awesome": "^4.7.0",
     "i18next": "^19.4.5",
     "i18next-browser-languagedetector": "^4.2.0",
-    "millegrilles.common": "git+ssh://git.maceroc.com/git/millegrilles.common.nodejs#1.27",
+    "millegrilles.common": "git+ssh://git.maceroc.com/git/millegrilles.common.nodejs#1.28",
     "moment": "^2.26.0",
     "moment-timezone": "^0.5.31",
     "qrcode.react": "^1.0.0",
